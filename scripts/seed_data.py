@@ -6,7 +6,7 @@ Produces:
   - 220 transactions spread over Jan 2026
     - ~70 % captured
     - ~10 % authorized
-    - ~15 % refunded  (linked to a captured parent)
+    - ~15 % refunded  (linked to a captured parent; ~40 % are partial)
     - ~5  % chargeback (linked to a captured parent)
   - Currencies: IDR, THB, VND
 """
@@ -129,17 +129,26 @@ def seed(store: DataStore) -> None:
         ))
 
     # 3. Refunds  (linked to a captured parent)
+    #    ~40 % of refunds are partial (20–80 % of original amount)
     parents_for_refund = rng.sample(captured_ids, min(n_ref, len(captured_ids)))
     for parent_id in parents_for_refund:
         parent = store.get_transaction(parent_id)
         assert parent is not None
         # refund can happen up to 14 days after capture (potentially outside Jan)
         refund_dt = parent.captured_at + timedelta(days=rng.randint(0, 14))
+
+        # decide whether this refund is partial (~40 % chance)
+        if rng.random() < 0.40:
+            fraction = Decimal(str(round(rng.uniform(0.20, 0.80), 4)))
+            refund_amount = (parent.amount * fraction).quantize(Decimal("0.01"))
+        else:
+            refund_amount = parent.amount  # full refund
+
         store.add_transaction(Transaction(
             id=next_id("R"),
             seller_id=parent.seller_id,
             buyer_id=parent.buyer_id,
-            amount=parent.amount,          # full refund
+            amount=refund_amount,
             currency=parent.currency,
             status=TransactionStatus.REFUNDED,
             created_at=refund_dt,

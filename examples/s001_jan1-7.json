@@ -1,0 +1,145 @@
+{
+  "seller_id": "S-001",
+  "seller_name": "Batik Nusantara",
+  "commission_rate": "0.08",
+  "period_start": "2026-01-01",
+  "period_end": "2026-01-07",
+  "settlement_currency": "IDR",
+  "gross_volume": "18703607.80",
+  "commission_deducted": "1279221.20",
+  "refunds_deducted": "2713343.00",
+  "net_payout": "14711043.60",
+  "transaction_count": 8,
+  "refund_count": 2,
+  "fraud_flags": [],
+  "breakdown": [
+    {
+      "transaction_id": "T-0087",
+      "captured_at": "2026-01-01 00:28:22",
+      "original_amount": "2060072.09",
+      "original_currency": "IDR",
+      "converted_gross": "2060072.09",
+      "exchange_rate": "1",
+      "refunds": [],
+      "total_refunded_converted": "0.00",
+      "gross_after_refunds": "2060072.09",
+      "commission_rate": "0.08",
+      "commission_amount": "164805.77",
+      "net_payout": "1895266.32"
+    },
+    {
+      "transaction_id": "T-0092",
+      "captured_at": "2026-01-03 05:50:34",
+      "original_amount": "779402.11",
+      "original_currency": "IDR",
+      "converted_gross": "779402.11",
+      "exchange_rate": "1",
+      "refunds": [],
+      "total_refunded_converted": "0.00",
+      "gross_after_refunds": "779402.11",
+      "commission_rate": "0.08",
+      "commission_amount": "62352.17",
+      "net_payout": "717049.94"
+    },
+    {
+      "transaction_id": "T-0016",
+      "captured_at": "2026-01-04 05:06:55",
+      "original_amount": "2035765.7",
+      "original_currency": "IDR",
+      "converted_gross": "2035765.70",
+      "exchange_rate": "1",
+      "refunds": [],
+      "total_refunded_converted": "0.00",
+      "gross_after_refunds": "2035765.70",
+      "commission_rate": "0.08",
+      "commission_amount": "162861.26",
+      "net_payout": "1872904.44"
+    },
+    {
+      "transaction_id": "T-0030",
+      "captured_at": "2026-01-04 08:38:18",
+      "original_amount": "3672942.59",
+      "original_currency": "IDR",
+      "converted_gross": "3672942.59",
+      "exchange_rate": "1",
+      "refunds": [],
+      "total_refunded_converted": "0.00",
+      "gross_after_refunds": "3672942.59",
+      "commission_rate": "0.08",
+      "commission_amount": "293835.41",
+      "net_payout": "3379107.18"
+    },
+    {
+      "transaction_id": "T-0037",
+      "captured_at": "2026-01-04 10:33:17",
+      "original_amount": "4305195.23",
+      "original_currency": "IDR",
+      "converted_gross": "4305195.23",
+      "exchange_rate": "1",
+      "refunds": [],
+      "total_refunded_converted": "0.00",
+      "gross_after_refunds": "4305195.23",
+      "commission_rate": "0.08",
+      "commission_amount": "344415.62",
+      "net_payout": "3960779.61"
+    },
+    {
+      "transaction_id": "T-0151",
+      "captured_at": "2026-01-04 22:35:24",
+      "original_amount": "1359998.32",
+      "original_currency": "IDR",
+      "converted_gross": "1359998.32",
+      "exchange_rate": "1",
+      "refunds": [
+        {
+          "refund_id": "R-0193",
+          "amount": "540055.33",
+          "currency": "IDR",
+          "status": "refunded",
+          "date": "2026-01-14 22:35:24"
+        }
+      ],
+      "total_refunded_converted": "540055.33",
+      "gross_after_refunds": "819942.99",
+      "commission_rate": "0.08",
+      "commission_amount": "65595.44",
+      "net_payout": "754347.55"
+    },
+    {
+      "transaction_id": "T-0142",
+      "captured_at": "2026-01-07 03:07:34",
+      "original_amount": "2789126.89",
+      "original_currency": "IDR",
+      "converted_gross": "2789126.89",
+      "exchange_rate": "1",
+      "refunds": [
+        {
+          "refund_id": "R-0185",
+          "amount": "2173287.67",
+          "currency": "IDR",
+          "status": "refunded",
+          "date": "2026-01-07 03:07:34"
+        }
+      ],
+      "total_refunded_converted": "2173287.67",
+      "gross_after_refunds": "615839.22",
+      "commission_rate": "0.08",
+      "commission_amount": "49267.14",
+      "net_payout": "566572.08"
+    },
+    {
+      "transaction_id": "T-0066",
+      "captured_at": "2026-01-07 08:24:57",
+      "original_amount": "1701104.87",
+      "original_currency": "IDR",
+      "converted_gross": "1701104.87",
+      "exchange_rate": "1",
+      "refunds": [],
+      "total_refunded_converted": "0.00",
+      "gross_after_refunds": "1701104.87",
+      "commission_rate": "0.08",
+      "commission_amount": "136088.39",
+      "net_payout": "1565016.48"
+    }
+  ]
+}

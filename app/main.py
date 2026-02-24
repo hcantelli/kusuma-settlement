@@ -1,5 +1,6 @@
 from contextlib import asynccontextmanager
 from datetime import date
+from decimal import Decimal
 
 from fastapi import FastAPI, HTTPException, Query
 
@@ -49,6 +50,7 @@ def get_payout(
     seller_id: str,
     start_date: date = Query(..., example="2026-01-01"),
     end_date:   date = Query(..., example="2026-01-07"),
+    preview:    bool = Query(default=False),
 ):
     if start_date > end_date:
         raise HTTPException(400, "start_date must not be after end_date")
@@ -56,7 +58,70 @@ def get_payout(
         result = calculate_payout(seller_id, start_date, end_date, store)
     except ValueError as exc:
         raise HTTPException(404, str(exc))
+
+    if preview:
+        data = result.model_dump()
+        data["preview"] = True
+        data["note"] = "No funds will be moved"
+        return data
+
     return result.model_dump()
+
+
+@app.post(
+    "/api/v1/sellers/{seller_id}/payout/execute",
+    summary="Mark a payout as executed and record it",
+)
+def execute_payout(
+    seller_id: str,
+    start_date: date = Query(...),
+    end_date:   date = Query(...),
+):
+    """Mark a payout as executed and record it."""
+    if start_date > end_date:
+        raise HTTPException(400, "start_date must not be after end_date")
+    try:
+        result = calculate_payout(seller_id, start_date, end_date, store)
+    except ValueError as exc:
+        raise HTTPException(404, str(exc))
+
+    execution_record = store.record_execution(result)
+    return {
+        "execution": execution_record,
+        "payout_summary": result.model_dump(),
+    }
+
+
+@app.get(
+    "/api/v1/payouts/batch",
+    summary="Calculate payouts for ALL sellers in one call",
+)
+def batch_payouts(
+    start_date: date = Query(...),
+    end_date:   date = Query(...),
+):
+    """Calculate payouts for ALL sellers in one call."""
+    if start_date > end_date:
+        raise HTTPException(400, "start_date must not be after end_date")
+
+    payouts = []
+    grand_totals: dict[str, Decimal] = {}
+
+    for seller in store.list_sellers():
+        try:
+            result = calculate_payout(seller.id, start_date, end_date, store)
+            payouts.append(result.model_dump())
+            currency_key = result.settlement_currency.value
+            grand_totals[currency_key] = (
+                grand_totals.get(currency_key, Decimal("0.00")) + result.net_payout
+            )
+        except Exception:
+            pass
+
+    return {
+        "payouts": payouts,
+        "grand_totals": {k: str(v) for k, v in grand_totals.items()},
+    }
 
 
 @app.get(
@@ -82,6 +147,14 @@ def get_pending_payouts(
         except Exception:
             pass
     return {"pending_payouts": results}
+
+
+@app.get(
+    "/api/v1/executions",
+    summary="List all recorded payout executions",
+)
+def list_executions():
+    return {"executions": store.executions}
 
 
 # ── Admin ─────────────────────────────────────────────────────────────────────

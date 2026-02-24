@@ -50,6 +50,12 @@ class RefundDetail(BaseModel):
     date: datetime
 
 
+class FraudFlag(BaseModel):
+    transaction_id: str
+    reason: str
+    severity: str  # "low" | "medium" | "high"
+
+
 class TransactionLineItem(BaseModel):
     transaction_id: str
     captured_at: datetime
@@ -83,4 +89,5 @@ class PayoutSummary(BaseModel):
     net_payout: Decimal
     transaction_count: int
     refund_count: int
+    fraud_flags: list[FraudFlag] = []
     breakdown: list[TransactionLineItem]

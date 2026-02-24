@@ -1,3 +1,4 @@
+from datetime import datetime as _dt
 from typing import Optional
 from app.models import Seller, Transaction
 
@@ -6,6 +7,7 @@ class DataStore:
     def __init__(self) -> None:
         self.sellers: dict[str, Seller] = {}
         self.transactions: dict[str, Transaction] = {}
+        self.executions: list[dict] = []
 
     # ── writes ────────────────────────────────────────────────────────────────
 
@@ -18,6 +20,20 @@ class DataStore:
     def clear(self) -> None:
         self.sellers.clear()
         self.transactions.clear()
+        self.executions = []
+
+    def record_execution(self, payout_summary) -> dict:
+        record = {
+            "execution_id": f"EXE-{len(self.executions)+1:04d}",
+            "executed_at": _dt.utcnow().isoformat() + "Z",
+            "seller_id": payout_summary.seller_id,
+            "period_start": payout_summary.period_start,
+            "period_end": payout_summary.period_end,
+            "net_payout": str(payout_summary.net_payout),
+            "currency": payout_summary.settlement_currency,
+        }
+        self.executions.append(record)
+        return record
 
     # ── reads ─────────────────────────────────────────────────────────────────
 

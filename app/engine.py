@@ -6,12 +6,41 @@ from app.models import (
     TransactionStatus,
     TransactionLineItem,
     RefundDetail,
+    FraudFlag,
     PayoutSummary,
 )
 from app.store import DataStore
 from app.currency import convert
 
 _ZERO = Decimal("0.00")
+
+
+def _detect_fraud(captured: list, refund_map: dict, seller) -> list[FraudFlag]:
+    flags = []
+    amounts = [float(t.amount) for t in captured]
+    if not amounts:
+        return flags
+    avg = sum(amounts) / len(amounts)
+
+    for txn in captured:
+        # Flag transactions > 3x the seller's average in this period
+        if float(txn.amount) > avg * 3:
+            flags.append(FraudFlag(
+                transaction_id=txn.id,
+                reason=f"Amount {txn.amount} {txn.currency} is {txn.amount / Decimal(str(avg)):.1f}x the period average",
+                severity="high" if float(txn.amount) > avg * 5 else "medium",
+            ))
+
+    # Flag if refund rate > 30%
+    refunded_count = sum(1 for v in refund_map.values() if v)
+    if len(captured) > 0 and refunded_count / len(captured) > 0.30:
+        flags.append(FraudFlag(
+            transaction_id="SELLER",
+            reason=f"High refund rate: {refunded_count}/{len(captured)} transactions refunded ({refunded_count/len(captured)*100:.0f}%)",
+            severity="medium",
+        ))
+
+    return flags
 
 
 def calculate_payout(
@@ -118,5 +147,6 @@ def calculate_payout(
         net_payout=total_net,
         transaction_count=len(captured),
         refund_count=refund_count,
+        fraud_flags=_detect_fraud(captured, refund_map, seller),
         breakdown=line_items,
     )

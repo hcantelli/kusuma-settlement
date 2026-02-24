@@ -55,7 +55,7 @@ Generated deterministically by `scripts/seed_data.py` (seed = 42).
 220 transactions over January 2026:
 - ~70 % captured
 - ~10 % authorized (excluded from payouts)
-- ~15 % refunded (full refund, linked to parent)
+- ~15 % refunded (~60 % full, ~40 % partial at 20–80 % of original)
 - ~5 % chargeback (linked to parent)
 
 ## How the calculation works
@@ -78,8 +78,38 @@ Generated deterministically by `scripts/seed_data.py` (seed = 42).
 | In-memory store | Keeps the prototype self-contained; replace `DataStore` with a DB-backed repository without changing the engine. |
 | `Decimal` arithmetic | Avoids floating-point rounding errors in financial calculations. |
 
+## Stretch Goals
+
+### Preview mode
+Add `&preview=true` to any payout request to simulate without side effects:
+```
+GET /api/v1/sellers/S-001/payout?start_date=2026-01-01&end_date=2026-01-07&preview=true
+```
+
+### Batch payouts
+Calculate all sellers in one request:
+```
+GET /api/v1/payouts/batch?start_date=2026-01-01&end_date=2026-01-07
+```
+
+### Execute & audit trail
+```
+POST /api/v1/sellers/S-001/payout/execute?start_date=2026-01-01&end_date=2026-01-07
+GET  /api/v1/executions
+```
+
+### Fraud flagging
+Every payout response includes a `fraud_flags` array. Flags are raised when:
+- A transaction amount exceeds 3× the seller's period average (severity: medium/high)
+- The seller's refund rate in the period exceeds 30% (severity: medium)
+
+### Partial refunds
+The test dataset includes partial refunds (20–80% of original amount) in addition to full refunds.
+
+## Example output
+See [`examples/s001_jan1-7.json`](examples/s001_jan1-7.json) for a full payout calculation response for seller S-001, January 1–7 2026.
+
 ## Assumptions
 
-- Refunds are always full (100 %) in the test data; the engine handles partial refunds correctly.
 - Exchange rates are fixed; rate-at-capture would be used in production.
 - The service has no authentication layer (prototype scope).
